@@ -12,6 +12,7 @@ def read_input(part, split_lines=True):
 
 
 DIRS = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+DIAG_DIRS = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
 
 
 def in_bounds(a, b):
