@@ -1,4 +1,5 @@
 import sys
+import re
 
 
 def read_input(part, split_lines=True):
@@ -17,6 +18,10 @@ DIAG_DIRS = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1
 
 def in_bounds(a, b):
     return lambda c: 0 <= c[0] < a and 0 <= c[1] < b
+
+
+def nums(s):
+    return [int(n) for n in re.findall(r"-?\d+", s)]
 
 
 # queue = deque()
