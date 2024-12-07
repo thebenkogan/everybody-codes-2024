@@ -1,4 +1,5 @@
 from collections import deque
+import heapq
 from ec import DIRS, read_input
 
 
@@ -21,40 +22,37 @@ def read_grid(p):
     return (grid, starts, (ex, ey))
 
 
-def bfs(grid, start, end):
+def dijkstra(grid, start, end):
     sx, sy = start
-    q = deque([(sx, sy, 0, 0)])
-    seen = set([(sx, sy, 0)])
+    q = [(0, sx, sy)]
+    seen = set()
     while len(q) > 0:
-        x, y, level, steps = q.popleft()
+        steps, x, y = heapq.heappop(q)
         if (x, y) in end:
             return steps
-
-        # first try moving up and down
-        for dy in [-1, 1]:
-            new_level = (level + dy) % 10
-            if (x, y, new_level) in seen:
-                continue
-            seen.add((x, y, new_level))
-            q.append((x, y, new_level, steps + 1))
+        if (x, y) in seen:
+            continue
+        seen.add((x, y))
+        level = grid[y][x]
 
         for dx, dy in DIRS:
             nx, ny = x + dx, y + dy
             if nx < 0 or ny < 0 or nx >= len(grid[0]) or ny >= len(grid):
                 continue
             nb = grid[ny][nx]
-            if nb == "#" or nb != level or (nx, ny, level) in seen:
+            if nb == "#":
                 continue
 
-            seen.add((nx, ny, level))
-            q.append((nx, ny, level, steps + 1))
+            hi, lo = max(level, nb), min(level, nb)
+            dist = min(hi - lo, (lo + 10) - hi) + 1
+            heapq.heappush(q, (steps + dist, nx, ny))
 
 
 grid, starts, end = read_grid(1)
-print(bfs(grid, starts[0], set([end])))
+print(dijkstra(grid, starts[0], set([end])))
 
 grid, starts, end = read_grid(2)
-print(bfs(grid, starts[0], set([end])))
+print(dijkstra(grid, starts[0], set([end])))
 
 grid, starts, end = read_grid(3)
-print(bfs(grid, end, set(starts)))
+print(dijkstra(grid, end, set(starts)))
