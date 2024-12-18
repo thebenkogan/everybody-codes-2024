@@ -1,9 +1,10 @@
 from collections import defaultdict
 import heapq
+import math
 from ec import read_input
 
 
-def parse(p):
+def parse(p, max_weight=math.inf):
     lines = read_input(p)
 
     stars = []
@@ -18,8 +19,9 @@ def parse(p):
             ix, iy = stars[i]
             jx, jy = stars[j]
             md = abs(ix - jx) + abs(iy - jy)
-            adj[stars[i]].append((md, stars[j]))
-            adj[stars[j]].append((md, stars[i]))
+            if md < max_weight:
+                adj[stars[i]].append((md, stars[j]))
+                adj[stars[j]].append((md, stars[i]))
 
     return stars, adj
 
@@ -49,19 +51,17 @@ def prim(p):
 print(prim(1))
 print(prim(2))
 
-stars, adj = parse(3)
+stars, adj = parse(3, max_weight=6)
 
-all_seen = set()
 remaining = set(stars)
 sizes = []
-while len(all_seen) < len(stars):
+while len(remaining) > 0:
     start = remaining.pop()
     total_weight = 0
     seen = {start}
     frontier = []
     for w, n in adj[start]:
-        if w < 6 and n not in all_seen:
-            heapq.heappush(frontier, (w, n))
+        heapq.heappush(frontier, (w, n))
 
     while len(frontier) > 0:
         w, curr = heapq.heappop(frontier)
@@ -70,10 +70,9 @@ while len(all_seen) < len(stars):
         seen.add(curr)
         total_weight += w
         for w, pos in adj[curr]:
-            if pos not in seen and pos not in all_seen and w < 6:
+            if pos not in seen:
                 heapq.heappush(frontier, (w, pos))
 
-    all_seen.update(seen)
     remaining.difference_update(seen)
     sizes.append(total_weight + len(seen))
 
